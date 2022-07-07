@@ -15,8 +15,8 @@ var baseURL string = "https://kr.indeed.com/jobs?q=python&limit=50"
 type extractedJob struct {
 	id       string
 	title    string
+	company  string
 	location string
-	salary   string
 	summary  string
 }
 
@@ -59,7 +59,7 @@ func getPageInfo(page int) {
 	doc, err := goquery.NewDocumentFromReader(res.Body)
 	checkErr(err)
 
-	searchCards := doc.Find(".job_seen_beacon")
+	searchCards := doc.Find(".jcs-JobTitle")
 	searchCards.Each(func(i int, card *goquery.Selection) {
 		extractJob(card)
 	})
@@ -72,8 +72,11 @@ func extractJob(card *goquery.Selection) {
 	//location := cleanString(card.Find(".companyLocation").Text())
 	//fmt.Println(id, title, location)
 
-	id, exist := card.Attr("data-jk")
-	fmt.Println(id, exist)
+	id, _ := card.Attr("data-jk")
+	title := card.Find(".title").Text()
+	location := cleanString(card.Find(".companyLocation").Text())
+
+	fmt.Println(id, title, location)
 }
 
 func cleanString(str string) string {
